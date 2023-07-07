@@ -127,16 +127,43 @@ class Tree {
     pointer = pointer.value > val ? pointer.left : pointer.right;
     return this.find(val, pointer);
   }
+  levelOrder(func = null, queue = [this.root], visited = [this.root.value]) {
+    if (!this.root) return null;
+    if (queue[0] == null) {
+      if (!func) return visited;
+      for (let i of visited) func(this.find(i));
+      return;
+    }
+
+    const first = queue.shift();
+    if (first) {
+      if (first.left) {
+        queue.push(first.left);
+        visited.push(first.left.value);
+      }
+      if (first.right) {
+        queue.push(first.right);
+        visited.push(first.right.value);
+      }
+    }
+
+    return this.levelOrder(func, queue, visited);
+  }
 }
 
-let array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
+//let array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 //let array = [50, 30, 20, 70, 40, 32, 34, 36, 60, 80, 65, 75, 85];
 //let array = [11, 23, 8, 14, 30, 9, 6, 17, 22, 28, 25, 15, 7, 10, 19];
+let array = [30, 10, 20, 40, 50];
 //const sortedArr = Array.from(new Set(array)).sort((a, b) => a - b);
 
 //let array = [1, 3, 4, 5, 7, 8, 9];
 let t = new Tree(array);
 //console.log(t);
+function findNode(n) {
+  console.log(n);
+}
 t.buildTree();
-console.log(t.find(4));
+t.levelOrder(prettyPrint);
+//console.log(x);
 //prettyPrint(t.root);
