@@ -29,8 +29,7 @@ class Tree {
     if (arr.length <= 1) return new Node(arr[0]);
     if (!arr || arr.length == 0) return null;
     // Sorting and removing dupes from array
-    const sortedArr = Array.from(new Set(arr)).sort((a, b) => a - b);
-
+    const sortedArr = arr.slice().sort((a, b) => a - b);
     // Calculating the middle, right and left sides of the array
     const middle = Math.floor(sortedArr.length / 2);
     const left = sortedArr.slice(0, middle);
@@ -173,12 +172,63 @@ class Tree {
       return;
     }
   }
-}
+  inOrder(func = null, stack = [this.root], visited = []) {
+    if (stack.length <= 0) {
+      if (!func) return visited;
+      for (let i of visited) func(this.find(i));
+      return;
+    }
+    const last = stack[stack.length - 1];
 
+    if (last.left && !visited.includes(last.left.value)) {
+      stack.push(last.left);
+      return this.inOrder(func, stack, visited);
+    }
+    if (last.right && !visited.includes(last.right.value)) {
+      stack.push(last.right);
+      visited.push(last.value);
+      return this.inOrder(func, stack, visited);
+    }
+    if (!visited.includes(last.value)) visited.push(last.value);
+    stack.pop();
+    return this.inOrder(func, stack, visited);
+  }
+  postOrder(func = null, stack = [this.root], visited = []) {
+    if (stack.length <= 0) {
+      if (!func) return visited;
+      for (let i of visited) func(this.find(i));
+      return;
+    }
+    const last = stack[stack.length - 1];
+
+    if (last.left && !visited.includes(last.left.value)) {
+      stack.push(last.left);
+      return this.postOrder(func, stack, visited);
+    }
+    if (last.right && !visited.includes(last.right.value)) {
+      stack.push(last.right);
+      return this.postOrder(func, stack, visited);
+    }
+    if (!visited.includes(last.value)) visited.push(last.value);
+    stack.pop();
+    return this.postOrder(func, stack, visited);
+  }
+  height(pointer = this.root) {
+    if (!pointer) return 0;
+
+    const leftHeight = this.height(pointer.left);
+    const rightHeight = this.height(pointer.right);
+
+    return 1 + Math.max(leftHeight, rightHeight);
+  }
+  // v = [10];
+  // s = [30, 15,];
+}
 //let array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 //let array = [50, 30, 20, 70, 40, 32, 34, 36, 60, 80, 65, 75, 85];
 //let array = [11, 23, 8, 14, 30, 9, 6, 17, 22, 28, 25, 15, 7, 10, 19];
-let array = [30, 10, 20, 40, 50, 15];
+// let array = [30, 10, 20, 40, 50, 15];
+let array = [40, 30, 25, 35, 15, 28, 50, 45, 60, 55, 70];
 //const sortedArr = Array.from(new Set(array)).sort((a, b) => a - b);
 
 //let array = [1, 3, 4, 5, 7, 8, 9];
@@ -186,8 +236,11 @@ let t = new Tree(array);
 //console.log(t);
 
 t.buildTree();
+t.insert(44);
+t.insert(43);
 // console.log(t.preOrder());
-t.preOrder(prettyPrint);
-//prettyPrint(t.root);
+// t.preOrder();
+console.log(t.height());
+prettyPrint(t.root);
 //console.log(x);
 //prettyPrint(t.root);
