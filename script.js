@@ -1,16 +1,3 @@
-const prettyPrint = (node, prefix = "", isLeft = true) => {
-  if (node === null) {
-    return;
-  }
-  if (node.right !== null) {
-    prettyPrint(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
-  }
-  console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.value}`);
-  if (node.left !== null) {
-    prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
-  }
-};
-
 class Node {
   constructor(value = null) {
     this.value = value;
@@ -21,8 +8,7 @@ class Node {
 
 class Tree {
   constructor(array) {
-    this.array = array;
-    this.root = null;
+    this.root = this.buildTree(array);
   }
   buildTree(arr = this.array) {
     if (arr[0] == null) return null;
@@ -214,33 +200,58 @@ class Tree {
     return this.postOrder(func, stack, visited);
   }
   height(pointer = this.root) {
-    if (!pointer) return 0;
+    if (!pointer) return -1;
 
     const leftHeight = this.height(pointer.left);
     const rightHeight = this.height(pointer.right);
 
     return 1 + Math.max(leftHeight, rightHeight);
   }
-  // v = [10];
-  // s = [30, 15,];
+  depth(target, pointer = this.root, currentDepth = 0) {
+    if (!pointer) return -1;
+    if (pointer === target) return currentDepth;
+
+    const leftDepth = this.depth(target, pointer.left, currentDepth + 1);
+    if (leftDepth !== -1) return leftDepth;
+
+    const rightDepth = this.depth(target, pointer.right, currentDepth + 1);
+    if (rightDepth !== -1) return rightDepth;
+
+    return -1; // target node not found in either subtree
+  }
+  isBalanced(pointer = this.root) {
+    if (!pointer) return true;
+    const heightDiff = Math.abs(
+      this.height(pointer.left) - this.height(pointer.right)
+    );
+    return (
+      heightDiff <= 1 &&
+      this.isBalanced(pointer.left) &&
+      this.isBalanced(pointer.right)
+    );
+  }
+  rebalance() {
+    this.root = this.buildTree(this.inOrder());
+  }
 }
-//let array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
-//let array = [50, 30, 20, 70, 40, 32, 34, 36, 60, 80, 65, 75, 85];
-//let array = [11, 23, 8, 14, 30, 9, 6, 17, 22, 28, 25, 15, 7, 10, 19];
-// let array = [30, 10, 20, 40, 50, 15];
+
+// Driver
 let array = [40, 30, 25, 35, 15, 28, 50, 45, 60, 55, 70];
-//const sortedArr = Array.from(new Set(array)).sort((a, b) => a - b);
-
-//let array = [1, 3, 4, 5, 7, 8, 9];
 let t = new Tree(array);
-//console.log(t);
 
-t.buildTree();
-t.insert(44);
+console.log(t.isBalanced());
+console.log("in Order", t.inOrder());
+console.log("pre Order", t.preOrder());
+console.log("post Order", t.postOrder());
+t.insert(40);
 t.insert(43);
-// console.log(t.preOrder());
-// t.preOrder();
-console.log(t.height());
-prettyPrint(t.root);
-//console.log(x);
-//prettyPrint(t.root);
+t.insert(24);
+t.insert(23);
+t.insert(64);
+console.log(t.isBalanced());
+t.rebalance();
+console.log(t.isBalanced());
+console.log("in Order", t.inOrder());
+console.log("pre Order", t.preOrder());
+console.log("post Order", t.postOrder());
+
